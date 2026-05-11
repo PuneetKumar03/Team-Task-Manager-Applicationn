@@ -1,0 +1,86 @@
+﻿@using TaskManager.Utility.Constants
+@using TaskManager.Utility.Helpers
+@model IEnumerable<TaskManager.Models.Entities.TaskItem>
+@{
+    ViewData["Title"] = "Tasks";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h5 style="font-weight:700;color:#1a1a2e;margin:0">Tasks</h5>
+        <p style="font-size:13px;color:#94a3b8;margin:0">@Model.Count() tasks total</p>
+    </div>
+    @if (User.IsInRole(SD.Role_Admin))
+    {
+        <a asp-action="Create" class="btn-tm-primary btn-tm-sm text-decoration-none d-inline-flex align-items-center gap-1">
+            <i class="bi bi-plus-lg"></i>New Task
+        </a>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="tm-empty">
+        <i class="bi bi-list-check"></i>
+        <p style="font-size:14px;margin-top:8px">No tasks found.</p>
+    </div>
+}
+else
+{
+    <div class="tm-card">
+        <table class="tm-table">
+            <thead>
+                <tr><th>Task</th><th>Project</th><th>Assignee</th><th>Priority</th><th>Status</th><th>Deadline</th><th>Progress</th><th></th></tr>
+            </thead>
+            <tbody>
+                @foreach (var task in Model)
+                {
+                    var statusClass = task.Status.ToString() switch
+                    {
+                        "Todo" => "todo",
+                        "InProgress" => "progress",
+                        "InReview" => "review",
+                        "Completed" => "done",
+                        _ => "todo"
+                    };
+                    <tr>
+                        <td style="font-size:13px;font-weight:500;color:#1a1a2e;max-width:180px">@task.Title</td>
+                        <td style="font-size:12px;color:#64748b">@(task.Project?.Name ?? "-")</td>
+                        <td style="font-size:12px;color:#64748b">@(task.AssignedTo?.FullName ?? "Unassigned")</td>
+                        <td><span class="tm-badge tm-badge-@task.Priority.ToString().ToLower()">@task.Priority</span></td>
+                        <td><span class="tm-badge tm-badge-@statusClass">@task.Status</span></td>
+                        <td style="font-size:12px" class="@DateHelper.GetDeadlineCssClass(task.Deadline)">
+                            @DateHelper.FormatForDisplay(task.Deadline)
+                        </td>
+                        <td>
+                            <div class="tm-progress" style="width:70px">
+                                <div class="tm-progress-fill" style="width:@task.ProgressPercentage%"></div>
+                            </div>
+                            <div style="font-size:11px;color:#94a3b8;margin-top:2px">@task.ProgressPercentage%</div>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a asp-action="UpdateStatus" asp-route-id="@task.Id"
+                                   class="btn-tm-primary btn-tm-sm text-decoration-none">Update</a>
+                                @if (User.IsInRole(SD.Role_Admin))
+                                {
+                                    <a asp-action="Edit" asp-route-id="@task.Id"
+                                       class="btn-tm-outline btn-tm-sm text-decoration-none">Edit</a>
+                                    <form asp-action="Delete" method="post" class="d-inline"
+                                          onsubmit="return confirm('Delete this task?')">
+                                        @Html.AntiForgeryToken()
+                                        <input type="hidden" name="id" value="@task.Id" />
+                                        <input type="hidden" name="projectId" value="@task.ProjectId" />
+                                        <button type="submit" class="btn-tm-danger" style="padding:6px 10px">
+                                            <i class="bi bi-trash3"></i>
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

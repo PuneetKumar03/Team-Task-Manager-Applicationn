@@ -1,0 +1,39 @@
+﻿@model TaskManager.Web.ViewModels.ProjectCreateViewModel
+@{
+    ViewData["Title"] = "New Project";
+}
+
+<div class="tm-form-card">
+    <div class="tm-form-title">Create project</div>
+    <div class="tm-form-subtitle">Fill in the details to create a new project</div>
+
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger small rounded-3 mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label">Project name</label>
+            <input asp-for="Name" class="form-control" placeholder="e.g. Website Redesign" />
+            <span asp-validation-for="Name" class="text-danger" style="font-size:12px"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label">Description <span class="text-muted fw-normal">(optional)</span></label>
+            <textarea asp-for="Description" class="form-control" rows="3" placeholder="What is this project about?"></textarea>
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col">
+                <label asp-for="StartDate" class="form-label">Start date</label>
+                <input asp-for="StartDate" class="form-control" type="date" />
+                <span asp-validation-for="StartDate" class="text-danger" style="font-size:12px"></span>
+            </div>
+            <div class="col">
+                <label asp-for="Deadline" class="form-label">Deadline <span class="text-muted fw-normal">(optional)</span></label>
+                <input asp-for="Deadline" class="form-control" type="date" />
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn-tm-primary">Create project</button>
+            <a asp-action="Index" class="btn-tm-outline text-decoration-none">Cancel</a>
+        </div>
+    </form>
+</div>

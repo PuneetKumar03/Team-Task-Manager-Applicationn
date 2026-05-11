@@ -1,0 +1,267 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>@ViewData["Title"] — TaskManager</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css" rel="stylesheet"/>
+    <style>
+        :root {
+            --sidebar-bg: #1e2235;
+            --sidebar-active: #6366f1;
+            --sidebar-hover: #2a3050;
+            --sidebar-text: #94a3b8;
+            --sidebar-text-active: #ffffff;
+            --accent: #6366f1;
+            --page-bg: #f4f6fb;
+        }
+        * { box-sizing: border-box; }
+        body { background: var(--page-bg); font-family: 'Segoe UI', system-ui, sans-serif; margin: 0; }
+
+        /* ── Sidebar ── */
+        .tm-sidebar {
+            width: 230px; min-width: 230px; min-height: 100vh;
+            background: var(--sidebar-bg);
+            display: flex; flex-direction: column;
+            padding: 20px 12px; position: sticky; top: 0; height: 100vh;
+        }
+        .tm-logo {
+            display: flex; align-items: center; gap: 10px;
+            color: #fff; font-weight: 700; font-size: 16px;
+            padding: 0 8px 24px; border-bottom: 1px solid #2a3050; margin-bottom: 16px;
+        }
+        .tm-logo-icon {
+            width: 32px; height: 32px; background: var(--accent);
+            border-radius: 8px; display: flex; align-items: center;
+            justify-content: center; color: #fff; font-size: 16px;
+        }
+        .tm-nav-link {
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 12px; border-radius: 8px; color: var(--sidebar-text);
+            font-size: 13.5px; text-decoration: none; transition: all .15s;
+            margin-bottom: 2px;
+        }
+        .tm-nav-link:hover { background: var(--sidebar-hover); color: #e2e8f0; }
+        .tm-nav-link.active { background: var(--accent); color: #fff; font-weight: 500; }
+        .tm-nav-link i { font-size: 17px; width: 20px; text-align: center; }
+        .tm-sidebar-footer {
+            margin-top: auto; border-top: 1px solid #2a3050; padding-top: 14px;
+        }
+        .tm-user {
+            display: flex; align-items: center; gap: 10px; padding: 6px 8px;
+        }
+        .tm-avatar {
+            width: 34px; height: 34px; border-radius: 50%;
+            background: var(--accent); color: #fff;
+            font-size: 12px; font-weight: 700;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .tm-user-name { color: #e2e8f0; font-size: 13px; font-weight: 500; }
+        .tm-user-role { color: #64748b; font-size: 11px; }
+        .tm-logout {
+            display: flex; align-items: center; gap: 8px;
+            width: 100%; background: none; border: none; cursor: pointer;
+            color: #ef4444; font-size: 13px; padding: 8px 12px;
+            border-radius: 8px; transition: background .15s; margin-top: 4px;
+        }
+        .tm-logout:hover { background: rgba(239,68,68,.1); }
+
+        /* ── Topbar ── */
+        .tm-topbar {
+            background: #fff; border-bottom: 1px solid #e8ecf4;
+            padding: 14px 28px; display: flex;
+            align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 10;
+        }
+        .tm-topbar-title { font-size: 17px; font-weight: 600; color: #1a1a2e; }
+        .tm-topbar-date { font-size: 12px; color: #94a3b8; }
+
+        /* ── Content ── */
+        .tm-content { padding: 28px; flex: 1; }
+
+        /* ── Stat Cards ── */
+        .tm-stat {
+            background: #fff; border-radius: 14px; padding: 20px;
+            border: 1px solid #e8ecf4; position: relative; overflow: hidden;
+        }
+        .tm-stat-accent {
+            position: absolute; left: 0; top: 0; bottom: 0;
+            width: 4px; border-radius: 4px 0 0 4px;
+        }
+        .tm-stat-label { font-size: 11px; color: #64748b; font-weight: 600;
+            text-transform: uppercase; letter-spacing: .6px; margin-bottom: 8px; }
+        .tm-stat-value { font-size: 32px; font-weight: 700; color: #1a1a2e; line-height: 1; }
+        .tm-stat-sub { font-size: 12px; color: #94a3b8; margin-top: 6px; }
+        .tm-stat-icon {
+            position: absolute; right: 18px; top: 50%; transform: translateY(-50%);
+            font-size: 36px; opacity: .07; color: #1a1a2e;
+        }
+
+        /* ── Cards ── */
+        .tm-card { background: #fff; border-radius: 14px; border: 1px solid #e8ecf4; overflow: hidden; }
+        .tm-card-head {
+            padding: 16px 20px; border-bottom: 1px solid #f1f5f9;
+            display: flex; align-items: center; justify-content: space-between;
+        }
+        .tm-card-title { font-size: 14px; font-weight: 600; color: #1a1a2e; }
+
+        /* ── Badges ── */
+        .tm-badge {
+            font-size: 11px; font-weight: 600; padding: 3px 10px;
+            border-radius: 20px; white-space: nowrap;
+        }
+        .tm-badge-todo     { background: #f1f5f9; color: #475569; }
+        .tm-badge-progress { background: #eef2ff; color: #4338ca; }
+        .tm-badge-review   { background: #fef3c7; color: #92400e; }
+        .tm-badge-done     { background: #d1fae5; color: #065f46; }
+        .tm-badge-low      { background: #d1fae5; color: #065f46; }
+        .tm-badge-medium   { background: #e0f2fe; color: #0369a1; }
+        .tm-badge-high     { background: #fef3c7; color: #92400e; }
+        .tm-badge-critical { background: #fee2e2; color: #991b1b; }
+
+        /* ── Table ── */
+        .tm-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+        .tm-table th {
+            padding: 10px 16px; font-size: 11px; font-weight: 600;
+            color: #64748b; text-transform: uppercase; letter-spacing: .4px;
+            border-bottom: 1px solid #f1f5f9; background: #fafbfc; text-align: left;
+        }
+        .tm-table td { padding: 12px 16px; border-bottom: 1px solid #f8fafc; vertical-align: middle; }
+        .tm-table tr:last-child td { border-bottom: none; }
+        .tm-table tr:hover td { background: #fafbfc; }
+
+        /* ── Forms ── */
+        .tm-form-card {
+            background: #fff; border-radius: 14px; border: 1px solid #e8ecf4;
+            padding: 32px; max-width: 640px; margin: 0 auto;
+        }
+        .tm-form-title { font-size: 20px; font-weight: 700; color: #1a1a2e; margin-bottom: 6px; }
+        .tm-form-subtitle { font-size: 13px; color: #94a3b8; margin-bottom: 28px; }
+        .form-label { font-size: 13px; font-weight: 500; color: #374151; }
+        .form-control, .form-select {
+            border-radius: 8px; border: 1px solid #e2e8f0;
+            font-size: 13.5px; padding: 9px 12px; transition: border .15s;
+        }
+        .form-control:focus, .form-select:focus {
+            border-color: var(--accent); box-shadow: 0 0 0 3px rgba(99,102,241,.12);
+        }
+
+        /* ── Buttons ── */
+        .btn-tm-primary {
+            background: var(--accent); color: #fff; border: none;
+            padding: 9px 20px; border-radius: 8px; font-size: 13.5px;
+            font-weight: 500; cursor: pointer; transition: all .15s;
+        }
+        .btn-tm-primary:hover { background: #4f46e5; color: #fff; }
+        .btn-tm-outline {
+            background: transparent; color: #374151;
+            border: 1px solid #e2e8f0; padding: 9px 20px;
+            border-radius: 8px; font-size: 13.5px; cursor: pointer; transition: all .15s;
+        }
+        .btn-tm-outline:hover { background: #f8fafc; }
+        .btn-tm-danger {
+            background: transparent; color: #ef4444;
+            border: 1px solid #fecaca; padding: 7px 14px;
+            border-radius: 8px; font-size: 12px; cursor: pointer; transition: all .15s;
+        }
+        .btn-tm-danger:hover { background: #fee2e2; }
+        .btn-tm-sm {
+            padding: 6px 14px; font-size: 12px; border-radius: 7px;
+        }
+
+        /* ── Empty state ── */
+        .tm-empty { text-align: center; padding: 60px 20px; color: #94a3b8; }
+        .tm-empty i { font-size: 48px; display: block; margin-bottom: 12px; opacity: .4; }
+
+        /* ── Progress ── */
+        .tm-progress { height: 6px; background: #f1f5f9; border-radius: 3px; overflow: hidden; }
+        .tm-progress-fill { height: 100%; background: var(--accent); border-radius: 3px; }
+
+        /* ── Auth pages ── */
+        .tm-auth-wrap {
+            min-height: 100vh; display: flex; align-items: center;
+            justify-content: center; background: #f4f6fb;
+        }
+        .tm-auth-card {
+            background: #fff; border-radius: 16px; border: 1px solid #e8ecf4;
+            padding: 40px; width: 420px;
+        }
+        .tm-auth-logo {
+            display: flex; align-items: center; gap: 10px;
+            margin-bottom: 28px; justify-content: center;
+        }
+        .tm-auth-title { font-size: 22px; font-weight: 700; color: #1a1a2e; }
+        .tm-auth-sub { font-size: 13px; color: #94a3b8; margin-top: 4px; margin-bottom: 28px; }
+    </style>
+</head>
+<body>
+<div class="d-flex">
+
+@if (User.Identity?.IsAuthenticated == true)
+{
+    @* ── Sidebar ── *@
+    <aside class="tm-sidebar">
+        <div class="tm-logo">
+            <div class="tm-logo-icon"><i class="bi bi-check2-square"></i></div>
+            TaskManager
+        </div>
+
+        <nav class="d-flex flex-column gap-1 flex-grow-1">
+            <a asp-controller="Dashboard" asp-action="Index"
+               class="tm-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Dashboard" ? "active" : "")">
+                <i class="bi bi-speedometer2"></i>Dashboard
+            </a>
+            <a asp-controller="Project" asp-action="Index"
+               class="tm-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Project" ? "active" : "")">
+                <i class="bi bi-folder2-open"></i>Projects
+            </a>
+            <a asp-controller="Task" asp-action="Index"
+               class="tm-nav-link @(ViewContext.RouteData.Values["controller"]?.ToString() == "Task" ? "active" : "")">
+                <i class="bi bi-list-check"></i>My Tasks
+            </a>
+        </nav>
+
+        <div class="tm-sidebar-footer">
+            <div class="tm-user">
+                <div class="tm-avatar">
+                    @(User.Identity?.Name?.Substring(0,1).ToUpper() ?? "U")
+                </div>
+                <div>
+                    <div class="tm-user-name">@User.Identity?.Name</div>
+                    <div class="tm-user-role">
+                        @(User.IsInRole("Admin") ? "Administrator" : "Member")
+                    </div>
+                </div>
+            </div>
+            <form asp-controller="Account" asp-action="Logout" method="post">
+                @Html.AntiForgeryToken()
+                <button type="submit" class="tm-logout">
+                    <i class="bi bi-box-arrow-right"></i>Sign out
+                </button>
+            </form>
+        </div>
+    </aside>
+}
+
+@* ── Main ── *@
+<div class="flex-grow-1 d-flex flex-column" style="min-height:100vh">
+    @if (User.Identity?.IsAuthenticated == true)
+    {
+        <header class="tm-topbar">
+            <span class="tm-topbar-title">@(ViewData["Title"] ?? "Dashboard")</span>
+            <span class="tm-topbar-date">@DateTime.Now.ToString("dddd, dd MMMM yyyy")</span>
+        </header>
+    }
+    <div class="tm-content">
+        <partial name="_Notifications"/>
+        @RenderBody()
+    </div>
+</div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

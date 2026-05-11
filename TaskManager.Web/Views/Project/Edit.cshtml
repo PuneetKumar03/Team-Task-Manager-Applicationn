@@ -1,0 +1,39 @@
+﻿@model TaskManager.Web.ViewModels.ProjectEditViewModel
+@{
+    ViewData["Title"] = "Edit Project";
+}
+
+<div class="tm-form-card">
+    <div class="tm-form-title">Edit project</div>
+    <div class="tm-form-subtitle">Update the details for this project</div>
+
+    <form asp-action="Edit" method="post">
+        @Html.AntiForgeryToken()
+        <input asp-for="Id" type="hidden" />
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger small rounded-3 mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="Name" class="form-label">Project name</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger" style="font-size:12px"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label">Description</label>
+            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col">
+                <label asp-for="StartDate" class="form-label">Start date</label>
+                <input asp-for="StartDate" class="form-control" type="date" />
+            </div>
+            <div class="col">
+                <label asp-for="Deadline" class="form-label">Deadline</label>
+                <input asp-for="Deadline" class="form-control" type="date" />
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn-tm-primary">Save changes</button>
+            <a asp-action="Index" class="btn-tm-outline text-decoration-none">Cancel</a>
+        </div>
+    </form>
+</div>

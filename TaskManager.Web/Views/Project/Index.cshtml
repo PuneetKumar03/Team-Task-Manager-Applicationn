@@ -1,0 +1,81 @@
+﻿@using TaskManager.Utility.Constants
+@model IEnumerable<TaskManager.Models.Entities.Project>
+@{
+    ViewData["Title"] = "Projects";
+}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h5 style="font-weight:700;color:#1a1a2e;margin:0">Projects</h5>
+        <p style="font-size:13px;color:#94a3b8;margin:0">@Model.Count() active projects</p>
+    </div>
+    @if (User.IsInRole(SD.Role_Admin))
+    {
+        <a asp-action="Create" class="btn-tm-primary btn-tm-sm text-decoration-none d-inline-flex align-items-center gap-1">
+            <i class="bi bi-plus-lg"></i>New Project
+        </a>
+    }
+</div>
+
+@if (!Model.Any())
+{
+    <div class="tm-empty">
+        <i class="bi bi-folder2-open"></i>
+        <p style="font-size:14px;margin-top:8px">No projects yet. Create your first project.</p>
+    </div>
+}
+else
+{
+    <div class="row g-3">
+        @foreach (var project in Model)
+        {
+            var completed = project.Tasks.Count(t => t.Status == TaskManager.Models.Enums.TaskStatus.Completed);
+            var total = project.Tasks.Count;
+            var pct = total == 0 ? 0 : (int)Math.Round((double)completed / total * 100);
+
+            <div class="col-md-4">
+                <div class="tm-card h-100 d-flex flex-column">
+                    <div style="padding:20px 20px 14px">
+                        <div style="font-size:15px;font-weight:700;color:#1a1a2e;margin-bottom:6px">@project.Name</div>
+                        <div style="font-size:12px;color:#94a3b8;min-height:36px">
+                            @(string.IsNullOrEmpty(project.Description) ? "No description" : project.Description)
+                        </div>
+                    </div>
+                    <div style="padding:0 20px 12px">
+                        <div class="d-flex justify-content-between mb-1" style="font-size:11px;color:#64748b">
+                            <span>Progress</span><span style="color:#6366f1;font-weight:600">@pct%</span>
+                        </div>
+                        <div class="tm-progress">
+                            <div class="tm-progress-fill" style="width:@pct%"></div>
+                        </div>
+                    </div>
+                    <div style="padding:10px 20px;border-top:1px solid #f1f5f9;display:flex;gap:16px;font-size:12px;color:#64748b">
+                        <span><i class="bi bi-list-task me-1"></i>@total tasks</span>
+                        <span><i class="bi bi-people me-1"></i>@project.Members.Count members</span>
+                        @if (project.Deadline.HasValue)
+                        {
+                            <span class="ms-auto"><i class="bi bi-calendar3 me-1"></i>@project.Deadline.Value.ToString("dd MMM")</span>
+                        }
+                    </div>
+                    <div style="padding:12px 20px;border-top:1px solid #f1f5f9;display:flex;gap:8px" class="mt-auto">
+                        <a asp-action="Details" asp-route-id="@project.Id"
+                           class="btn-tm-primary btn-tm-sm text-decoration-none flex-grow-1 text-center">View</a>
+                        @if (User.IsInRole(SD.Role_Admin))
+                        {
+                            <a asp-action="Edit" asp-route-id="@project.Id"
+                               class="btn-tm-outline btn-tm-sm text-decoration-none">Edit</a>
+                            <form asp-action="Delete" method="post" class="d-inline"
+                                  onsubmit="return confirm('Delete this project?')">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="id" value="@project.Id" />
+                                <button type="submit" class="btn-tm-danger">
+                                    <i class="bi bi-trash3"></i>
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

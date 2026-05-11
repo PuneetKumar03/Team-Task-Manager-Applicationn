@@ -1,0 +1,49 @@
+﻿@model TaskManager.Web.ViewModels.TaskCreateViewModel
+@{
+    ViewData["Title"] = "New Task";
+}
+
+<div class="tm-form-card">
+    <div class="tm-form-title">Create task</div>
+    <div class="tm-form-subtitle">Add a new task to a project</div>
+
+    <form asp-action="Create" method="post">
+        @Html.AntiForgeryToken()
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger small rounded-3 mb-3"></div>
+
+        <div class="mb-3">
+            <label asp-for="Title" class="form-label">Task title</label>
+            <input asp-for="Title" class="form-control" placeholder="e.g. Design homepage layout" />
+            <span asp-validation-for="Title" class="text-danger" style="font-size:12px"></span>
+        </div>
+        <div class="mb-3">
+            <label asp-for="Description" class="form-label">Description <span class="text-muted fw-normal">(optional)</span></label>
+            <textarea asp-for="Description" class="form-control" rows="3"></textarea>
+        </div>
+        <div class="row g-3 mb-3">
+            <div class="col">
+                <label asp-for="ProjectId" class="form-label">Project</label>
+                <select asp-for="ProjectId" asp-items="Model.ProjectList" class="form-select"></select>
+                <span asp-validation-for="ProjectId" class="text-danger" style="font-size:12px"></span>
+            </div>
+            <div class="col">
+                <label asp-for="AssignedToUserId" class="form-label">Assign to</label>
+                <select asp-for="AssignedToUserId" asp-items="Model.MemberList" class="form-select"></select>
+            </div>
+        </div>
+        <div class="row g-3 mb-4">
+            <div class="col">
+                <label asp-for="Priority" class="form-label">Priority</label>
+                <select asp-for="Priority" asp-items="Model.PriorityList" class="form-select"></select>
+            </div>
+            <div class="col">
+                <label asp-for="Deadline" class="form-label">Deadline <span class="text-muted fw-normal">(optional)</span></label>
+                <input asp-for="Deadline" class="form-control" type="date" />
+            </div>
+        </div>
+        <div class="d-flex gap-2">
+            <button type="submit" class="btn-tm-primary">Create task</button>
+            <a asp-action="Index" class="btn-tm-outline text-decoration-none">Cancel</a>
+        </div>
+    </form>
+</div>

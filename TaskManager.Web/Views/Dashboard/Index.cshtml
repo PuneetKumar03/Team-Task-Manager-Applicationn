@@ -1,0 +1,134 @@
+﻿@using TaskManager.Services.Interfaces
+@using TaskManager.Utility.Constants
+@using TaskManager.Utility.Helpers
+@model DashboardStatsDto
+@{ ViewData["Title"] = "Dashboard"; }
+
+@* ── Stat Cards ── *@
+<div class="row g-3 mb-4">
+    <div class="col-md-3">
+        <div class="tm-stat">
+            <div class="tm-stat-accent" style="background:#6366f1"></div>
+            <div class="tm-stat-label">Total Tasks</div>
+            <div class="tm-stat-value">@Model.TotalTasks</div>
+            <div class="tm-stat-sub">@Model.CompletionRate% completion rate</div>
+            <i class="bi bi-clipboard2-check tm-stat-icon"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="tm-stat">
+            <div class="tm-stat-accent" style="background:#10b981"></div>
+            <div class="tm-stat-label">Completed</div>
+            <div class="tm-stat-value" style="color:#10b981">@Model.CompletedTasks</div>
+            <div class="tm-stat-sub">Tasks finished</div>
+            <i class="bi bi-check-circle tm-stat-icon"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="tm-stat">
+            <div class="tm-stat-accent" style="background:#f59e0b"></div>
+            <div class="tm-stat-label">Pending</div>
+            <div class="tm-stat-value" style="color:#f59e0b">@Model.PendingTasks</div>
+            <div class="tm-stat-sub">In progress / todo</div>
+            <i class="bi bi-hourglass-split tm-stat-icon"></i>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="tm-stat">
+            <div class="tm-stat-accent" style="background:#ef4444"></div>
+            <div class="tm-stat-label">Overdue</div>
+            <div class="tm-stat-value" style="color:#ef4444">@Model.OverdueTasks</div>
+            <div class="tm-stat-sub">Past deadline</div>
+            <i class="bi bi-exclamation-triangle tm-stat-icon"></i>
+        </div>
+    </div>
+</div>
+
+@* ── Progress ── *@
+<div class="tm-card mb-4 p-3">
+    <div class="d-flex justify-content-between align-items-center mb-2">
+        <span style="font-size:13px;font-weight:600;color:#374151">Overall completion</span>
+        <span style="font-size:13px;color:#6366f1;font-weight:700">@Model.CompletionRate%</span>
+    </div>
+    <div class="tm-progress">
+        <div class="tm-progress-fill" style="width:@Model.CompletionRate%"></div>
+    </div>
+    <div class="d-flex justify-content-between mt-2" style="font-size:11px;color:#94a3b8">
+        <span>@Model.TotalProjects projects total</span>
+        <span>@Model.ActiveProjects active</span>
+    </div>
+</div>
+
+@* ── Recent + Deadlines ── *@
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="tm-card">
+            <div class="tm-card-head">
+                <span class="tm-card-title">Recent activity</span>
+                <span class="tm-badge tm-badge-todo">@Model.RecentTasks.Count() tasks</span>
+            </div>
+            @if (!Model.RecentTasks.Any())
+            {
+                <div class="tm-empty"><i class="bi bi-inbox"></i>No tasks yet</div>
+            }
+            else
+            {
+                @foreach (var task in Model.RecentTasks)
+                {
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #f8fafc">
+                        <div>
+                            <div style="font-size:13px;font-weight:500;color:#1a1a2e">@task.Title</div>
+                            <div style="font-size:11px;color:#94a3b8">@task.ProjectName</div>
+                        </div>
+                        <span class="ms-auto tm-badge @GetStatusBadge(task.Status)">@task.Status</span>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="tm-card">
+            <div class="tm-card-head">
+                <span class="tm-card-title">Upcoming deadlines</span>
+                <span class="tm-badge tm-badge-high">Next 7 days</span>
+            </div>
+            @if (!Model.UpcomingDeadlines.Any())
+            {
+                <div class="tm-empty"><i class="bi bi-calendar-check"></i>No upcoming deadlines</div>
+            }
+            else
+            {
+                @foreach (var task in Model.UpcomingDeadlines)
+                {
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px 20px;border-bottom:1px solid #f8fafc">
+                        <div>
+                            <div style="font-size:13px;font-weight:500;color:#1a1a2e">@task.Title</div>
+                            <div style="font-size:11px;color:#94a3b8">@task.ProjectName</div>
+                        </div>
+                        <span class="ms-auto" style="font-size:12px;font-weight:600;color:@GetDeadlineColor(task.Deadline);white-space:nowrap">
+                            @DateHelper.GetRelativeTime(task.Deadline)
+                        </span>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+@functions {
+    string GetStatusBadge(string status) => status switch {
+        "Todo"       => "tm-badge-todo",
+        "InProgress" => "tm-badge-progress",
+        "InReview"   => "tm-badge-review",
+        "Completed"  => "tm-badge-done",
+        _            => "tm-badge-todo"
+    };
+
+    string GetDeadlineColor(DateTime? d) {
+        if (!d.HasValue) return "#94a3b8";
+        var diff = (d.Value - DateTime.UtcNow).TotalDays;
+        if (diff < 0)  return "#ef4444";
+        if (diff <= 3) return "#f59e0b";
+        return "#6366f1";
+    }
+}

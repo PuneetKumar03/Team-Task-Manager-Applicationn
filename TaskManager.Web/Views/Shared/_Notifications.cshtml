@@ -1,0 +1,25 @@
+﻿@using TaskManager.Utility.Constants
+
+@if (TempData[SD.TempData_Success] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <i class="bi bi-check-circle me-2"></i>@TempData[SD.TempData_Success]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData[SD.TempData_Error] != null)
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-circle me-2"></i>@TempData[SD.TempData_Error]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@if (TempData[SD.TempData_Warning] != null)
+{
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+        <i class="bi bi-exclamation-triangle me-2"></i>@TempData[SD.TempData_Warning]
+        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+    </div>
+}

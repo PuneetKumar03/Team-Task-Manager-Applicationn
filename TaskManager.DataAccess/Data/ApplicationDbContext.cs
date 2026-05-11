@@ -50,7 +50,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.HasOne(pm => pm.User)
                   .WithMany(u => u.ProjectMemberships)
                   .HasForeignKey(pm => pm.UserId)
-                  .OnDelete(DeleteBehavior.Restrict);
+                 .OnDelete(DeleteBehavior.NoAction);
             // Restrict: deleting a User is BLOCKED if they have memberships.
             // This protects data integrity — deactivate users, don't delete them.
         });
@@ -91,7 +91,7 @@ public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
             entity.HasOne(t => t.CreatedBy)
                   .WithMany()
                   .HasForeignKey(t => t.CreatedByUserId)
-                  .OnDelete(DeleteBehavior.Restrict);
+                  .OnDelete(DeleteBehavior.NoAction);
 
             // Indexes for common dashboard queries
             entity.HasIndex(t => t.Status);

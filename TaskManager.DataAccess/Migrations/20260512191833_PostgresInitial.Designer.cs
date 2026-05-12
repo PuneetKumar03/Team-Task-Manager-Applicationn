@@ -12,8 +12,8 @@ using TaskManager.DataAccess.Data;
 namespace TaskManager.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260511162137_InitialCreate_Postgres")]
-    partial class InitialCreate_Postgres
+    [Migration("20260512191833_PostgresInitial")]
+    partial class PostgresInitial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -21,7 +21,7 @@ RUN dotnet publish TaskManager.Web/TaskManager.Web.csproj \
 # ── Stage 2: Runtime ──────────────────────────────────────────────────────────
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
-
+git add
 COPY --from=build /app/publish .
 
 ENV ASPNETCORE_URLS=http://+:8080

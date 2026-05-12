@@ -29,7 +29,7 @@ RUN apt-get update && apt-get install -y \
 
 COPY --from=build /app/publish .
 
-ENV ASPNETCORE_URLS=http://+:8080
+ENV ASPNETCORE_URLS=http://+:$PORT
 EXPOSE 8080
 
 ENTRYPOINT ["dotnet", "TaskManager.Web.dll"]

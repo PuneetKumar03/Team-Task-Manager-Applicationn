@@ -201,8 +201,7 @@ namespace TaskManager.DataAccess.Migrations
                         name: "FK_ProjectMembers_AspNetUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_ProjectMembers_Projects_ProjectId",
                         column: x => x.ProjectId,
@@ -242,8 +241,7 @@ namespace TaskManager.DataAccess.Migrations
                         name: "FK_TaskItems_AspNetUsers_CreatedByUserId",
                         column: x => x.CreatedByUserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_TaskItems_Projects_ProjectId",
                         column: x => x.ProjectId,

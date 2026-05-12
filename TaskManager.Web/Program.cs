@@ -8,6 +8,7 @@ using TaskManager.Models.Entities;
 using TaskManager.Services.Implementations;
 using TaskManager.Services.Interfaces;
 using Npgsql.EntityFrameworkCore.PostgreSQL;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 var builder = WebApplication.CreateBuilder(args);
 
 // ── Database ───────────────────────────────────────────────────────────────
@@ -25,11 +26,12 @@ if (connectionString.StartsWith("postgresql://") || connectionString.StartsWith(
 }
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseNpgsql(connectionString,
-        npgsql => {
-            npgsql.MigrationsAssembly("TaskManager.DataAccess");
-            npgsql.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null);
-        }));
+{
+    options.UseNpgsql(
+        builder.Configuration.GetConnectionString("DefaultConnection"))
+    .ConfigureWarnings(w =>
+        w.Ignore(RelationalEventId.PendingModelChangesWarning));
+});
 
 // ── Identity ───────────────────────────────────────────────────────────────
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>(options =>
@@ -89,5 +91,7 @@ app.MapControllerRoute(
 
 // API routes
 app.MapControllers();
+var port = Environment.GetEnvironmentVariable("PORT") ?? "8080";
 
+app.Urls.Add($"http://0.0.0.0:{port}");
 app.Run();

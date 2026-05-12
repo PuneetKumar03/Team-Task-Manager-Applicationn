@@ -12,7 +12,7 @@ using TaskManager.DataAccess.Data;
 namespace TaskManager.DataAccess.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260509094819_InitialCreate")]
+    [Migration("20260512204441_Initial-Create")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -433,7 +433,7 @@ namespace TaskManager.DataAccess.Migrations
                     b.HasOne("TaskManager.Models.Entities.ApplicationUser", "User")
                         .WithMany("ProjectMemberships")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.Navigation("Project");
@@ -451,7 +451,7 @@ namespace TaskManager.DataAccess.Migrations
                     b.HasOne("TaskManager.Models.Entities.ApplicationUser", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedByUserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.NoAction)
                         .IsRequired();
 
                     b.HasOne("TaskManager.Models.Entities.Project", "Project")
